@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "package": "com.managetime.app",
+  "serial": "emulator-5554",
+  "started_at": "2026-09-24T19:07:18.737975+00:00",
+  "status": "passed",
+  "assertions": [
+    {
+      "name": "explicit_emulator_and_installed_app",
+      "status": "passed",
+      "details": "emulator-5554"
+    },
+    {
+      "name": "usage_access",
+      "status": "passed",
+      "details": "GET_USAGE_STATS: allow"
+    },
+    {
+      "name": "launch_after_real_settings_use",
+      "status": "passed",
+      "details": "Opened system Settings for 3 seconds, then Manage Time"
+    },
+    {
+      "name": "navigate_01-today",
+      "status": "passed",
+      "details": "Tapped observed 今日 bounds at (127, 2272); captured app UI"
+    },
+    {
+      "name": "navigate_02-timeline",
+      "status": "passed",
+      "details": "Tapped observed 时间轴 bounds at (403, 2272); captured app UI"
+    },
+    {
+      "name": "navigate_03-statistics",
+      "status": "passed",
+      "details": "Tapped observed 统计 bounds at (677, 2272); captured app UI"
+    },
+    {
+      "name": "navigate_04-settings",
+      "status": "passed",
+      "details": "Tapped observed 设置 bounds at (952, 2272); captured app UI"
+    },
+    {
+      "name": "process_alive_after_navigation",
+      "status": "passed",
+      "details": "com.managetime.app"
+    },
+    {
+      "name": "no_app_crash_or_anr_in_logcat",
+      "status": "passed",
+      "details": "No matching fatal/native crash or ANR since test launch"
+    }
+  ],
+  "captures": [
+    {
+      "tab": "今日",
+      "image": "01-today.png",
+      "hierarchy": "01-today.xml"
+    },
+    {
+      "tab": "时间轴",
+      "image": "02-timeline.png",
+      "hierarchy": "02-timeline.xml"
+    },
+    {
+      "tab": "统计",
+      "image": "03-statistics.png",
+      "hierarchy": "03-statistics.xml"
+    },
+    {
+      "tab": "设置",
+      "image": "04-settings.png",
+      "hierarchy": "04-settings.xml"
+    }
+  ],
+  "crash_check": {
+    "completed": true,
+    "since_device_time": "09-24 19:07:18.000",
+    "crashes": [],
+    "anrs": []
+  },
+  "limitations": [
+    "Emulator smoke only; not real-device or OEM background-reliability validation.",
+    "No Bilibili/post recognition assertion; accessibility capture is not enabled.",
+    "Does not prove historical usage accuracy or test every privacy control."
+  ],
+  "device": {
+    "sdk": "35",
+    "model": "sdk_gphone64_x86_64"
+  },
+  "finished_at": "2026-09-24T19:08:00.934973+00:00"
+}

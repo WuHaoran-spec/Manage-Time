@@ -2,6 +2,12 @@
 
 本文件记录已有自动化测试和人工验收步骤，不代表已经完成真机验收。本次开发已通过全部 31 项单元测试与 Android Lint（无错误），并成功构建调试 APK。设备检查结果另行记录；下方清单不是已完成的验收声明。
 
+## 本次已验证结果
+
+2026-09-25（北京时间），应用代码提交 `108a4d006ec0c8a1f33e6991d66bc4d823158e00` 的 [GitHub Actions 构建](https://github.com/WuHaoran-spec/Manage-Time/actions/runs/36045602108) 全部通过：31 项单元测试、Android Lint、调试 APK 构建、Android 15 模拟器安装启动与四页导航。模拟器的 9 个检查项通过，未发现本应用崩溃或 ANR。已人工查看四张运行截图，修复并复核统计图日期裁切问题。
+
+机器可读结果保存在 [emulator-smoke-report.json](emulator-smoke-report.json)，实际截图位于 [images/](images/)。此检查未开启屏幕观察，也没有测试 B 站等第三方应用；真机识别、厂商省电策略与所有隐私控制仍需按下方步骤验证。
+
 ## 自动化测试
 
 在项目根目录使用 JDK 17、Android SDK 35 运行：

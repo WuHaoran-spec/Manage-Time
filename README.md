@@ -8,6 +8,17 @@
 
 > 当前为 **0.1.0 预览版**。应用用时与“屏幕上观察到的文字”分开记录。无法保证识别所有帖子或视频，也不把文字线索当成真实观看历史。
 
+## 实际界面
+
+Android 15 模拟器的实际运行截图。用时来自系统设置等测试操作，未注入演示数据库；这些截图不代表 B 站标题识别的真机效果。
+
+<p>
+  <img src="docs/images/01-today.png" width="200" alt="今日概览" />
+  <img src="docs/images/02-timeline.png" width="200" alt="分钟时间轴" />
+  <img src="docs/images/03-statistics.png" width="200" alt="最近七天统计" />
+  <img src="docs/images/04-settings.png" width="200" alt="记录与隐私设置" />
+</p>
+
 ## 功能
 
 | 功能 | 实现方式 |
