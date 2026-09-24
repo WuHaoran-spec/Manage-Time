@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.managetime.app.data.AppEntry
@@ -65,7 +67,11 @@ private fun duration(ms: Long): String {
     val m = ms.coerceAtLeast(0) / 60_000
     return if (m >= 60) "${m / 60} 小时 ${m % 60} 分" else if (m > 0) "${m} 分钟" else "${ms.coerceAtLeast(0) / 1000} 秒"
 }
-private fun shortDuration(ms: Long) = if (ms >= 3_600_000) String.format(Locale.ROOT, "%.1fh", ms / 3_600_000.0) else "${ms / 60_000}m"
+private fun shortDuration(ms: Long) = when {
+    ms >= 3_600_000 -> String.format(Locale.ROOT, "%.1fh", ms / 3_600_000.0)
+    ms >= 60_000 -> "${ms / 60_000}m"
+    else -> "${ms.coerceAtLeast(0) / 1000}s"
+}
 private fun dayStart(date: LocalDate) = date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 private fun clock(ts: Long) = Instant.ofEpochMilli(ts).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("HH:mm"))
 
@@ -76,7 +82,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         UsageSyncWorker.schedule(this)
         setContent {
-            MaterialTheme(colorScheme = lightColorScheme(primary = Ink, onPrimary = Color.White, secondary = Color(0xFF287A61), background = Paper, surface = Color.White, onSurface = Ink, surfaceVariant = Color(0xFFEAF0E9))) {
+            MaterialTheme(colorScheme = lightColorScheme(primary = Ink, onPrimary = Color.White, primaryContainer = Mint, onPrimaryContainer = Ink, secondary = Color(0xFF287A61), secondaryContainer = Mint, onSecondaryContainer = Ink, background = Paper, surface = Color.White, onSurface = Ink, surfaceVariant = Color(0xFFEAF0E9), outline = Muted)) {
                 ManageTime(this, revision)
             }
         }
@@ -193,7 +199,7 @@ private fun ManageTime(activity: MainActivity, revision: Int) {
     selectedApp?.let { pkg -> AppDialog(pkg, label(pkg), prefs, onDismiss = { selectedApp = null }, onSave = { refresh++; selectedApp = null }) }
     if (disclosure) AlertDialog(
         onDismissRequest = { disclosure = false }, title = { Text("开启屏幕观察？") },
-        text = { Text("开启后，无障碍服务会读取你所选应用公开的可见标题和页面文字，并把带时间戳的观察保存到手机。可能包含你正在浏览的个人内容。\n\n不录屏、不录音，不读取输入框或密码，不上传数据。默认没有选中任何应用；你需要随后选择应用并在系统中授权。标题可能缺失或识别不准，观察也不能证明你一直在观看。\n\n可随时暂停、关闭或删除。", fontSize = 14.sp) },
+        text = { Text("开启后，无障碍服务会读取你所选应用公开的可见标题和页面文字，并把带时间戳的观察保存到手机。可能包含你正在浏览的个人内容。\n\n不录屏、不录音，不读取输入框或密码，不上传数据。默认没有选中任何应用；你需要随后选择应用并在系统中授权。标题可能缺失或识别不准，观察也不能证明你一直在观看。\n\n可随时暂停、关闭或删除。", fontSize = 14.sp, modifier = Modifier.verticalScroll(rememberScrollState())) },
         confirmButton = { TextButton(onClick = { prefs.contentEnabled = true; disclosure = false; refresh++ }) { Text("同意并选择应用") } }, dismissButton = { TextButton(onClick = { disclosure = false }) { Text("暂不开启") } })
     if (erase) AlertDialog(onDismissRequest = { erase = false }, title = { Text("删除所有本机记录？") }, text = { Text("删除使用时长和屏幕观察，已删除的历史不会重新导入。已导出的文件需要你自行删除。") }, confirmButton = { TextButton(onClick = { erase = false; scope.launch { withContext(Dispatchers.IO) { repository.clearAll() }; refresh++; snackbar.showSnackbar("本机记录已删除") } }) { Text("删除", color = MaterialTheme.colorScheme.error) } }, dismissButton = { TextButton(onClick = { erase = false }) { Text("取消") } })
 }
@@ -292,7 +298,7 @@ private fun AppUsageRow(item: AppUsage, total: Long, name: String, prefs: Record
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AppAvatar(name, item.packageName)
                 Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) { Text(name, fontWeight = FontWeight.Medium, fontSize = 14.sp); Text(listOfNotNull(tag.takeIf { it.isNotBlank() }, "${item.launches} 次使用").joinToString(" · "), fontSize = 10.sp, color = Muted) }
+                Column(Modifier.weight(1f)) { Text(name, fontWeight = FontWeight.Medium, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis); Text(listOfNotNull(tag.takeIf { it.isNotBlank() }, "${item.launches} 次使用").joinToString(" · "), fontSize = 10.sp, color = Muted) }
                 Text(duration(item.durationMs), fontSize = 12.sp, fontWeight = FontWeight.Medium)
             }
             LinearProgressIndicator(progress = { if(total > 0) (item.durationMs.toFloat()/total).coerceIn(0f,1f) else 0f }, modifier = Modifier.fillMaxWidth().height(4.dp), color = appColor(item.packageName), trackColor = Paper)
@@ -357,7 +363,7 @@ private fun TimelinePage(data: Dashboard, date: LocalDate, label: (String) -> St
                         val entries = minutes[timestamp].orEmpty()
                         val captures = observations[timestamp].orEmpty()
                         if(entries.isEmpty() && captures.isEmpty()) Text("没有记录",fontSize=12.sp,color=Muted)
-                        entries.forEach { entry -> Row(verticalAlignment=Alignment.CenterVertically) { Box(Modifier.size(7.dp).background(appColor(entry.packageName),CircleShape));Spacer(Modifier.width(7.dp));Text(label(entry.packageName),fontSize=13.sp,fontWeight=FontWeight.Medium,modifier=Modifier.weight(1f));Text("${entry.durationMs/1000}秒",fontSize=11.sp,color=Muted) } }
+                        entries.forEach { entry -> Row(verticalAlignment=Alignment.CenterVertically) { Box(Modifier.size(7.dp).background(appColor(entry.packageName),CircleShape));Spacer(Modifier.width(7.dp));Text(label(entry.packageName),fontSize=13.sp,fontWeight=FontWeight.Medium,modifier=Modifier.weight(1f),maxLines=1,overflow=TextOverflow.Ellipsis);Text(if(entry.durationMs<1000) "<1秒" else "${entry.durationMs/1000}秒",fontSize=11.sp,color=Muted) } }
                         captures.forEach { observation ->
                             HorizontalDivider(color=Paper)
                             Text(observation.title,fontSize=13.sp,lineHeight=20.sp)
@@ -387,11 +393,11 @@ private fun StatisticsPage(data: Dashboard, date: LocalDate, prefs: RecorderPref
             Text(duration(total),fontSize=30.sp,fontWeight=FontWeight.SemiBold)
             Text(if(weekly) "日均 ${duration(total/7)} · ${date.minusDays(6)} 至 $date" else "${totals.size} 个应用 · ${totals.sumOf { it.launches }} 次使用",fontSize=11.sp,color=Muted)
             val max = daily.maxOf { it.second }.coerceAtLeast(1)
-            Row(Modifier.fillMaxWidth().height(150.dp),horizontalArrangement=Arrangement.spacedBy(10.dp),verticalAlignment=Alignment.Bottom) {
+            Row(Modifier.fillMaxWidth().height(180.dp),horizontalArrangement=Arrangement.spacedBy(10.dp),verticalAlignment=Alignment.Bottom) {
                 daily.forEach { (day,value) -> Column(Modifier.weight(1f),horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(8.dp)) {
-                    Text(shortDuration(value),fontSize=9.sp,color=Muted)
+                    Text(shortDuration(value),fontSize=9.sp,lineHeight=12.sp,color=Muted)
                     Box(Modifier.fillMaxWidth().height((value.toFloat()/max*100f).coerceAtLeast(3f).dp).background(if(day==date) Ink else Mint,RoundedCornerShape(7.dp)))
-                    Text("${day.monthValue}/${day.dayOfMonth}",fontSize=9.sp,color=Muted)
+                    Text("${day.monthValue}/${day.dayOfMonth}",fontSize=9.sp,lineHeight=12.sp,color=Muted)
                 } }
             }
             Text("记录不足的日期按已有记录计算，空白天计为 0。",fontSize=10.sp,color=Muted)
@@ -440,7 +446,7 @@ private fun SettingsPage(data: Dashboard,prefs:RecorderPreferences,onChange:()->
         }
         item { CardBlock {
             SectionTitle("数据与隐私")
-            Text("本应用没有网络权限。记录保存在应用私有目录，关闭云备份和设备迁移备份。",fontSize=12.sp,color=Muted,lineHeight=20.sp)
+            Text("本应用没有联网权限。记录保存在应用私有目录，关闭云备份和设备迁移备份。",fontSize=12.sp,color=Muted,lineHeight=20.sp)
             Text("保留时长",fontSize=13.sp)
             Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) { listOf(7,30,90).forEach { days -> FilterChip(selected=prefs.retentionDays==days,onClick={prefs.retentionDays=days;onChange()},label={Text("${days}天")}) } }
             Text("缩短保留时长会在刷新或下次同步时清理更早的记录。",fontSize=10.sp,color=Muted)
@@ -466,7 +472,7 @@ private fun AppDialog(pkg:String,label:String,prefs:RecorderPreferences,onDismis
     var tag by remember(pkg) { mutableStateOf(prefs.tag(pkg)) }
     var budget by remember(pkg) { mutableStateOf(prefs.dailyBudgetMinutes(pkg).takeIf{it>0}?.toString()?:"") }
     val valid = budget.isBlank() || (budget.toIntOrNull()?.let { it in 1..1440 } == true)
-    AlertDialog(onDismissRequest=onDismiss,title={Text(label)},text={Column(verticalArrangement=Arrangement.spacedBy(14.dp)) {
+    AlertDialog(onDismissRequest=onDismiss,title={Text(label)},text={Column(Modifier.verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(14.dp)) {
         Text(pkg,fontSize=10.sp,color=Muted)
         OutlinedTextField(value=tag,onValueChange={tag=it.take(24)},label={Text("标签，例如：学习 / 娱乐")},singleLine=true)
         OutlinedTextField(value=budget,onValueChange={budget=it.filter(Char::isDigit).take(4)},label={Text("每日预算（分钟）")},supportingText={Text(if(valid) "留空表示不限制。提醒可能受系统省电影响。" else "请输入 1–1440 分钟")},isError=!valid,keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number),singleLine=true)
