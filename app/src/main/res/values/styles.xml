@@ -1,0 +1,10 @@
+<resources>
+    <style name="Theme.ManageTime" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">#F6F8F5</item>
+        <item name="android:navigationBarColor">#F6F8F5</item>
+        <item name="android:colorAccent">#167C61</item>
+    </style>
+    <string name="accessibility_description">仅在你同意并选择应用后，记录这些应用公开的可见标题或页面文字，帮助回顾自己的时间。不会记录密码、输入框、截图或音频，不上传数据。标题可能缺失或识别不准；请在 Manage Time 内随时暂停或删除。此功能不是无障碍辅助工具。</string>
+</resources>
