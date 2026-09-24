@@ -21,7 +21,9 @@ Windows 使用 `gradlew.bat`。HTML 报告分别位于 `core/build/reports/tests
 | `app/src/test/java/com/managetime/app/data/SessionReplacementTest.kt` | 4 | 多次移动导入边界不增加使用次数、边界暂停、应用切换、未跨边界会话不重复 |
 | `app/src/test/java/com/managetime/app/capture/CapturePolicyTest.kt` | 4 | 敏感应用硬排除、普通内容应用允许、敏感文本拒绝、输入/聊天节点排除 |
 
-共 31 项测试验证时间计算、重新导入边界、采集过滤规则和 CSV 辅助函数，不验证 Android 系统是否提供完整事件，也不验证 B 站等第三方应用是否公开可读标题。当前没有自动化设备端/Compose UI 验收测试。
+共 31 项测试验证时间计算、重新导入边界、采集过滤规则和 CSV 辅助函数，不验证 Android 系统是否提供完整事件，也不验证 B 站等第三方应用是否公开可读标题。
+
+CI 另提供 Android 15 模拟器冒烟检查：`scripts/emulator-smoke.py` 在已经安装 APK 的指定模拟器上授权使用情况访问，打开系统设置生成真实事件，再启动应用、切换四个页面并保存截图、UI 层级和崩溃检查结果。它拒绝操作物理设备，不注入虚构数据库记录，也不验证第三方标题识别。运行结果见工作流的 `emulator-smoke` 工件；它不能替代下列真机验收。
 
 ## Android 人工验收
 

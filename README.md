@@ -1,5 +1,7 @@
 # Manage Time
 
+[![Android build](https://github.com/WuHaoran-spec/Manage-Time/actions/workflows/android.yml/badge.svg)](https://github.com/WuHaoran-spec/Manage-Time/actions/workflows/android.yml)
+
 **把时间，留给在意的事。**
 
 一个开源、无广告、数据保存在本机的 Android 时间记录应用。使用 Kotlin 与 Jetpack Compose 构建，支持 **Android 8.0（API 26）及以上**。界面采用适合手机的每日概览、分钟时间轴、统计与设置，灵感来自桌面时间追踪工具。
@@ -40,7 +42,7 @@ Android 13 及以上从外部安装的应用可能需要在系统应用详情菜
 - **屏幕观察**：只有用户选择的应用、屏幕解锁且存在可读节点时，才尝试保存标题线索。数据带原始采样时间和来源标记；不会把一次采样延伸为整分钟持续观看。
 - **不能还原过去看过的内容**：开启前的帖子和视频详情无法补录。应用使用历史首次最多导入最近约 48 小时；系统可能只保留更少事件。
 - **不能保证知道每一分钟具体看了什么**：短暂停留、标题隐藏、全屏视频、自绘界面、服务被系统停止都可能留下空白。显示“未识别”而不是编造内容。
-- **不是录屏 / OCR / 录音工具**：不申请截屏、麦克风、摄像头或网络权限。
+- **不是录屏 / OCR / 录音工具**：不申请截屏、麦克风、摄像头或互联网访问权限。
 
 ## 隐私
 
@@ -77,6 +79,7 @@ app/src/main/java/com/managetime/app/
   capture/                 可选的可见标题观察与过滤
 core/                      无 Android 依赖的用时算法、CSV 工具和单元测试
 .github/workflows/          构建、测试、Lint 和 APK 工件
+scripts/                   指定模拟器上的页面切换与截图检查
 docs/TESTING.md             测试与真机验收步骤
 ```
 
